@@ -1,5 +1,5 @@
 === Only one device login limit ===
-Contributors: codersantosh
+Contributors: codersantosh, yamchhetri
 Donate link: http://codersantosh.com/
 Tags: limit login, one device, login, signin, logout, signout, interval, duration, automatic, auto logout, idle time
 Requires at least: 3.0
