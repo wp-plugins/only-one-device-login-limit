@@ -25,7 +25,7 @@ Admin can view user status from  WP Admin > Users > All users.  From "User Statu
 Admin can setup only one device login limit plugin from WP Admin > Settings > Coder limit login
 
 Note : This plugin has not been tested compatibility with other plugins.
-If you find any issues, please use support forum or visit [codersantosh.com](http://codersantosh.com/only-one-device-login-limit/) to report.
+If you find any issues, please use [support forum](https://wordpress.org/support/plugin/only-one-device-login-limit) or visit [codersantosh.com](http://codersantosh.com/only-one-device-login-limit/) to report.
 
 == Installation ==
 
