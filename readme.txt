@@ -49,7 +49,7 @@ If you find any issues, please use support forum or visit [codersantosh.com](htt
 Go to the plugin's folder to the `/wp-content/plugins/` directory and rename "only-one-device-login-limit" folder.
 After that if you want to activate plugin again, don't forget to rename again to "only-one-device-login-limit"
 
-Need any help, please use support forum or visit [codersantosh.com](http://codersantosh.com/only-one-device-login-limit/)
+Need any help, please use [support forum](https://wordpress.org/support/plugin/only-one-device-login-limit) or visit [codersantosh.com](http://codersantosh.com/only-one-device-login-limit/)
 
 == Screenshots ==
 
