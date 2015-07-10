@@ -4,7 +4,7 @@ Donate link: http://codersantosh.com/
 Tags: limit login, one device, login, signin, logout, signout, interval, duration, automatic, auto logout, idle time
 Requires at least: 3.0
 Tested up to: 4.2.2
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,7 @@ Admin can view user status from  WP Admin > Users > All users.  From "User Statu
 
 Admin can setup only one device login limit plugin from WP Admin > Settings > Coder limit login
 
-Note : This plugin has not been tested compatibility with other plugins.
+Note : This plugin is compatible with most of the membership plugins.
 If you find any issues, please use [support forum](https://wordpress.org/support/plugin/only-one-device-login-limit) or visit [codersantosh.com](http://codersantosh.com/only-one-device-login-limit/) to report.
 
 == Installation ==
@@ -58,6 +58,13 @@ Need any help, please use [support forum](https://wordpress.org/support/plugin/o
 2. User status
 
 == Changelog ==
+
+= 1.1 =
+Make compatible with "Log Out of All Sessions" button
+
+Check and fixed compatibility issues with membership plugins
+
+Fixed issues
 
 = 1.0 =
 Initial version
