@@ -63,13 +63,7 @@ Need any help, please use [support forum](https://wordpress.org/support/plugin/o
 
 * Make compatible with "Log Out of All Sessions" button
 
-<<<<<<< .mine
 * Check and fixed compatibility issues with membership plugins
-=======
-* Check and fixed compatibility issues with membership plugins
-
-Fixed issues
->>>>>>> .r1196615
 
 * Fixed issues
 
