@@ -3,7 +3,7 @@
 Plugin Name: Only one device login limit
 Plugin URI: http://codersantosh.com
 Description: Limit login to one device at a time for a user
-Version: 1.0
+Version: 1.1
 Author: CoderSantosh
 Author URI: http://codersantosh.com
 License: GPL
@@ -192,6 +192,7 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
             /*check if user is already login*/
             add_action( 'wp_login', array($this,'coder_check_if_already_user_active') ,0 ,1 );
 
+
             /*set current user active time*/
             add_action( 'init', array($this,'coder_set_current_user_active_time') ,0 );
 
@@ -217,6 +218,9 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
 
             /*Actual function to make column sortable*/
             add_filter( 'pre_user_query', array($this,'coder_sortable_column_query') ,12 );
+
+            /*wp ajax handling*/
+            add_action( 'wp_ajax_coder_destroy_sessions_ajax', array($this,'coder_destroy_sessions_ajax_callback') ,12 );
 
             /*Setting admin menu*/
             require_once trailingslashit( $this->coder_limit_login_path ) . 'inc/coder-admin-menu.php';
@@ -287,7 +291,7 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
          * @return void
          *
          */
-        public function coder_force_logout($coder_logout_message){
+        public function coder_force_logout($coder_logout_message ){
             nocache_headers();
             wp_clear_auth_cookie();
             do_action('wp_logout');
@@ -312,6 +316,41 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
         }
 
         /**
+         * Logout function
+         *
+         * @access public
+         * @since 1.1
+         *
+         * @return void
+         *
+         */
+        public function coder_destroy_sessions ($coder_user_id){
+            if(class_exists('WP_Session_Tokens')){
+                $coder_sessions = WP_Session_Tokens::get_instance( $coder_user_id );
+                if ( $coder_user_id === get_current_user_id() ) {
+                    $coder_sessions->destroy_others( wp_get_session_token() );
+                } else {
+                    $coder_sessions->destroy_all();
+                }
+            }
+
+        }
+        /**
+         * Function to handle callback ajax
+         *
+         * @since 1.1
+         *
+         * @param null
+         * @return null
+         *
+         */
+        function coder_destroy_sessions_ajax_callback(){
+            $coder_user_id = $_POST['user_id'];
+            $this->coder_destroy_sessions($coder_user_id);
+            _e('User Is InActive', 'coder_limit_login');
+            exit;
+        }
+        /**
          * Store Last active time
          *
          * @access public
@@ -321,20 +360,16 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
          *
          */
         public function coder_set_current_user_active_time(){
+
             $coder_login_user_data = wp_get_current_user();
             $coder_login_user_id = $coder_login_user_data->ID;
-
             if( 'on' != $this->coder_enable_admin && in_array('administrator',$coder_login_user_data->roles) ){
                 $this->coder_allow_login( $coder_login_user_id );
                 return;
             }
             if ( is_user_logged_in() ) {
-
                 /*destroying other session*/
-                if(class_exists('WP_Session_Tokens')){
-                    $coder_sessions = WP_Session_Tokens::get_instance( get_current_user_id() );
-                    $coder_sessions->destroy_others( wp_get_session_token() );
-                }
+                $this->coder_destroy_sessions(get_current_user_id());
 
                 $coder_current_time = current_time( 'timestamp');
                 $coder_last_active_time = get_user_meta( $coder_login_user_id, 'coder_last_active_time', 'true' );
@@ -371,6 +406,7 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
             $coder_login_user_data = get_user_by( 'login', $coder_user_login_name );
 
             $coder_login_user_id = $coder_login_user_data->ID;
+
             $coder_first_time_login = get_user_meta( $coder_login_user_id, 'coder_first_time_login', 'true' );
             $coder_last_active_time = get_user_meta( $coder_login_user_id, 'coder_last_active_time', 'true' );
             $coder_is_logout = get_user_meta( $coder_login_user_id, 'coder_is_logout', 'true' );
@@ -393,7 +429,18 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
                 return $coder_user_login_name;
             }
             else{
-                $this->coder_force_logout($this->coder_already_login_message);
+                if(class_exists('WP_Session_Tokens')){
+                    $coder_sessions = WP_Session_Tokens::get_instance( $coder_login_user_id );
+                    /*Get all sessions of a user.*/
+
+                    $coder_get_sessions = $coder_sessions->get_all();
+                    if(count($coder_get_sessions) > 1){
+                        $this->coder_force_logout($this->coder_already_login_message );
+                    }
+                }
+                else{
+                    $this->coder_force_logout($this->coder_already_login_message );
+                }
             }
         }
 
@@ -429,7 +476,7 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
                     <th>
                         <label><?php _e('Is User Active', 'coder_limit_login'); ?></label>
                     </th>
-                    <td>
+                    <td id="coder-login-logout-status">
                         <?php
                         $coder_is_logout = get_user_meta( $coder_login_user_data->ID, 'coder_is_logout', 'true' );
                         if($coder_is_logout != 'yes'){
@@ -461,9 +508,11 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
          *
          */
         function coder_save_custom_user_profile_fields( $user_id ) {
-            if ( !current_user_can( 'edit_user', $user_id ) )
+            if ( !current_user_can( 'edit_user', $user_id ) || !isset($_POST['coder_is_logout']))
                 return $user_id;
             update_user_meta( $user_id, 'coder_is_logout', $_POST['coder_is_logout'] );
+
+            $this->coder_destroy_sessions($user_id);
         }
 
         /**
@@ -580,8 +629,8 @@ if ( ! class_exists( 'Coder_Limit_Login' ) ){
         }
     } /*END class Coder_Limit_Login*/
 
-    /*Initialize class after theme setup*/
-    add_action( 'init', array ( Coder_Limit_Login::coder_get_instance(), 'coder_limit_login_init' ));
+    /*Initialize class in after_setup_theme*/
+    add_action( 'after_setup_theme', array ( Coder_Limit_Login::coder_get_instance(), 'coder_limit_login_init' ));
 
     register_activation_hook( __FILE__, array( 'Coder_Limit_Login', 'plugin_activation' ) );
     register_deactivation_hook( __FILE__, array( 'Coder_Limit_Login', 'plugin_deactivation' ) );
