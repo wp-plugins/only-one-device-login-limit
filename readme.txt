@@ -60,11 +60,13 @@ Need any help, please use [support forum](https://wordpress.org/support/plugin/o
 == Changelog ==
 
 = 1.1 =
-Make compatible with "Log Out of All Sessions" button
 
-Check and fixed compatibility issues with membership plugins
+* Make compatible with "Log Out of All Sessions" button
+
+* Check and fixed compatibility issues with membership plugins
 
 Fixed issues
 
 = 1.0 =
-Initial version
+
+* Initial version
